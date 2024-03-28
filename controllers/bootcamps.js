@@ -1,24 +1,17 @@
+const path = require('path')
 const BootCamp = require('../models/Bootcamp')
 const errorHandler = require('../middleware/error')
 const ErrorResponse = require('../utils/errorHandler')
 const asyncHandler = require('../middleware/async')
 const GeoCoder = require('../utils/geoCoder')
+const Course = require('../models/Course')
 
 // @descr get all bootcamps
 // @route get api/v1/bootcamps
 //@access public
 exports.getBootcamps = asyncHandler(async (req,res,next) =>{
-    let query;
-    let queryString = JSON.stringify(req.query);
-    queryString = queryString.replace(/\b(gt|gte|lt|lte\in)\b/g,match =>`$${match}`);
-    query = BootCamp.find(JSON.parse(queryString));
-
-        const bootcamps = await query
-        res.status(200).json({
-            success:true,
-            count:bootcamps.length,
-            data:bootcamps
-        })
+   //here we are getting results from advanced results page as we have passed advancedResults module in the routes of getBootcamps
+        res.status(200).json(res.advancedResults)
 })
 
 // @descr get a bootcamp
@@ -75,12 +68,15 @@ exports.UpdateBootcamp = asyncHandler(async(req,res,next) =>{
 // @route Delete api/v1/bootcamp/:id
 //@access private
 exports.DeleteBootcamp = asyncHandler(async(req,res,next) =>{ 
-        const bootcamp = await BootCamp.findByIdAndDelete(req.params.id)
+        const bootcamp = await BootCamp.findById(req.params.id)
         if(!bootcamp){
             return next(
                 new ErrorResponse(`Bootcamp not found with the id ${req.params.id}`,404)
                 )
         }
+       await bootcamp.deleteOne({ _id: req.params.id });
+       //Deleting courses related to deleted bootcamp
+       await Course.deleteMany({ bootcamp: req.params.id})
         res.status(200).json({
             success:true,
             data:bootcamp
@@ -111,4 +107,56 @@ res.status(200).json({
     count:Bootcamps.length,
     data:Bootcamps
 })
+})
+
+
+// @descr photo upload
+// @route Delete api/v1/bootcamps/:id/photo
+//@access private
+exports.bootcampPhotoUpload = asyncHandler(async(req,res,next) =>{ 
+    const bootcamp = await BootCamp.findById(req.params.id)
+    if(!bootcamp){
+        return next(
+            new ErrorResponse(`Bootcamp not found with the id ${req.params.id}`,404)
+            )
+        }
+        
+        if(!req.files){
+            return next(
+                new ErrorResponse(`Please upload a photo`,400)
+                )
+        }
+       
+        const file = req.files.file;
+        //check the file type
+        if(!(file.mimetype.startsWith("image"))){
+            return next(
+            new ErrorResponse(`Please upload an image file`,400)
+            )
+
+        }
+       
+         //check file size
+        if(file.size>process.env.MAX_FILE_UPLOAD){
+            return next(
+            new ErrorResponse(`Please upload an image of size below 1MB`,400)
+            )
+        }
+        //create custom file name
+        file.name = `photo_${bootcamp._id}${path.parse(file.name).ext}`  
+
+        file.mv(`${process.env.FILE_UPLOAD_PATH}/${file.name}`, async err => {
+            if(err){
+                return next(
+                    new ErrorResponse('problem with file upload',500)
+                    )
+            }
+
+            await BootCamp.findByIdAndUpdate(req.params.id,{photo:file.name})
+
+            res.status(200).json({
+                success:true,
+                data:file.name
+            })
+        })
 })
