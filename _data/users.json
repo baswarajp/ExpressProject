@@ -15,15 +15,15 @@
 	},
 	{
 		"_id": "5d7a514b5d2c12c7449be044",
-		"name": "User Account",
-		"email": "user@gmail.com",
+		"name": "Baswa",
+		"email": "Baswa@gmail.com",
 		"role": "user",
 		"password": "123456"
 	},
 	{
 		"_id": "5d7a514b5d2c12c7449be045",
-		"name": "John Doe",
-		"email": "john@gmail.com",
+		"name": "Raj",
+		"email": "Raj@gmail.com",
 		"role": "publisher",
 		"password": "123456"
 	},

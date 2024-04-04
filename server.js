@@ -3,12 +3,14 @@ const express = require('express');
 const dotenv = require('dotenv')
 const logger = require('./middleware/logger')
 const fileupload = require('express-fileupload')
+const cookieParser = require('cookie-parser')
 
 //for checking the logger info like api request and response
 const morgan = require('morgan')
 //bootcamps files
 const bootcamps = require('./routes/bootcamps')
 const courses = require('./routes/courses')
+const auth = require('./routes/auth')
 
 const connectDB = require('./config/db')
 const errorHandler = require('./middleware/error')
@@ -18,6 +20,7 @@ dotenv.config({path:'./config/config.env'})
 connectDB();
 const app= express();
 app.use(express.json())
+app.use(cookieParser())
 
 if(process.env.NODE_ENV ==='development')
 {
@@ -32,6 +35,7 @@ app.use(express.static(path.join(__dirname,'public')))
 
 app.use('/api/v1/bootcamps',bootcamps)
 app.use('/api/v1/courses',courses)
+app.use('/api/v1/auth',auth)
 
 app.use(errorHandler)
 
