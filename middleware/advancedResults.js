@@ -37,7 +37,7 @@ const advancedResults = (model,populate) => async (req,res,next) => {
 
     //Pagination
     const page = parseInt(req.query.page,10) || 1;
-    const limit = parseInt(req.query.limit,10)|| 10;
+    const limit = parseInt(req.query.limit,10)|| 100;
     const startIndex = (page-1)*limit; // this is for skipping the records of previous pages
     const endIndex = page*limit;
     const total = await model.countDocuments(); 

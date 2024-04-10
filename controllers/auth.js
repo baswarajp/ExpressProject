@@ -83,6 +83,42 @@ exports.getMe = asyncHandler(async function (req,res,next) {
     })
 })
 
+// @descr update user details
+// @route get api/v1/auth/updatedetails
+// @access private
+
+exports.updatedetails = asyncHandler(async function (req,res,next) {
+const fieldsToUpdate = {
+    name:req.body.name,
+    email:req.body.email
+}
+    //here we have stored user data in req.user in auth middleware
+    const user = await User.findByIdAndUpdate(req.user.id,fieldsToUpdate,{
+        new:true,
+        runValidators:true
+    })
+    res.status(200).json({
+        succes:true,
+        data:user
+    })
+})
+
+// @descr update password
+// @route get api/v1/auth/updatepassword
+// @access private
+
+exports.updatePassword = asyncHandler(async function (req,res,next) {
+    console.log("req.body",req.body);
+    const user = await User.findById(req.user.id).select('+password');
+        //here we have stored user data in req.user in auth middleware
+      if(!(await user.matchPassword(req.body.currentPassword))){
+        return next(new ErrorResponse('incorrect password',401))
+      }
+      user.password = req.body.newPassword;
+      await user.save();
+      sendTokenResponse(user,200,res)
+    })
+
 // @descr Forgot password
 // @route get api/v1/auth/forgotPassword
 // @access public
@@ -101,7 +137,7 @@ exports.forgotPassword = asyncHandler(async function (req,res,next) {
     await user.save({validateBeforeSave:false})
 
     //create reset url
-    const resetUrl =`${req.protocol}://${req.get('host')}/api/v1/resetPassword/${resetToken}`;
+    const resetUrl =`${req.protocol}://${req.get('host')}/api/v1/auth/resetPassword/${resetToken}`;
     const message = `you are receivig this email because you or someone else requested for reset password.
     please make a put request to ${resetUrl}`
 
