@@ -53,6 +53,7 @@ exports.getCourse = asyncHandler(async (req,res,next) =>{
 // @route POST api/v1/bootcamps/:bootcampId/Courses
 // @access Private
 exports.addCourse = asyncHandler(async (req,res,next) =>{
+    console.log("req",req);
     req.body.bootcamp =  req.params.bootcampId
     req.body.user = req.user.id
     const bootcamp = await Bootcamp.findById(req.params.bootcampId)

@@ -6,7 +6,7 @@ const errorHandler = (err,req,res,next) =>{
     console.log("err",err);
 //Mangoose bad object id
     if(err.name === 'CastError'){
-        const message = `Bootcamp not found with the id ${err.value}`;
+        const message = `Resource not found`;
         error= new ErrorResponse(message,404)  
     }
     //Mangoose duplicate key error

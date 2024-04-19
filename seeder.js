@@ -11,6 +11,7 @@ dotenv.config({path:'./config/config.env'});
 const Bootcamp = require('./models/Bootcamp');
 const Course = require('./models/Course')
 const User = require('./models/User')
+const Review = require('./models/Review')
 
 const { argv } = require('process');
 
@@ -24,6 +25,9 @@ const Courses = JSON.parse(fs.readFileSync(`${__dirname}/_data/courses.json`,'ut
 
 const Users = JSON.parse(fs.readFileSync(`${__dirname}/_data/users.json`,'utf-8'));
 
+const Reviews = JSON.parse(fs.readFileSync(`${__dirname}/_data/reviews.json`,'utf-8'));
+
+
 
 //Import into DB
 const importData = async() =>{
@@ -31,6 +35,7 @@ const importData = async() =>{
         await Bootcamp.create(Bootcamps)
         await Course.create(Courses)
         await User.create(Users)
+        await Review.create(Reviews)
 
 
         console.log("Data Inserted");
@@ -47,6 +52,8 @@ const deleteData = async() =>{
         await Bootcamp.deleteMany() //it will delete all the data
         await Course.deleteMany() //it will delete all the data
         await User.deleteMany() //it will delete all the data
+        await Review.deleteMany() //it will delete all the data
+
 
         console.log("Data Deleted");
         process.exit();

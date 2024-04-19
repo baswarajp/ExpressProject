@@ -8,9 +8,14 @@ exports.protect = asyncHandler(async (req,res,next) =>{
     let token;
 
     if(req.headers.authorization && req.headers.authorization.startsWith('Bearer')){
+        //set token from bearer header
         token = req.headers.authorization.split(' ')[1];
         console.log("token",token);
     }
+    //here we are setting token to a cookie please comment this code to not to use cookies
+    // else if(req.cookies.token){
+    //     token = req.cookies.token;
+    // }
     if(!token){
         return next( new ErrorResponse("Not authorize to access this route",401))
     }
